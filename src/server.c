@@ -1,34 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#include <zconf.h>
-
-char** read_line(int file){
-    char detector = 0;
-    int line_beginning = lseek(file, 0, SEEK_CUR);
-    int line_size = 0;
-    while(read(file, detector, 1))
-    {
-        if( detector == '\n') break;
-        line_size++;
-    }
-    lseek(file, line_beginning, SEEK_SET);
-    char** line_content = (char**) malloc(line_size* sizeof(char*));
-    read(file, line_content, line_size);
-    return line_content;
-}
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/wait.h>
+#include "structs/user.h"
+#include "structs/group.h"
 
 int main(int argc, char** argv) {
-    int config_file = open('../config.txt', O_RDONLY);
-    if(config_file==0)
+    UserList* userList = create_usr_list_from_file("../config.txt");
+    GroupList* groupList = create_grp_list_from_file("../config.txt");
+    int main_key = msgget(1008, 0666|IPC_CREAT);
+    int run_mainloop = 1;
+    if(main_key)
     {
-        return 0;
+            LoginReq *login_request = (LoginReq*)malloc(sizeof(LoginReq));
+            printf("Waiting for login request\n");
+            msgrcv(main_key, login_request, sizeof(LoginReq)- sizeof(long),1,0);
+            printf("%s %s\n", login_request->username, login_request->password);
+//                login_user(
+//                        find_on_usr_list(userList, login_request->username),
+//                        login_request->password,
+//                        login_request->pid);
     }
-    char** string;
-    string = read_line(config_file);
-    printf('%s\n' ,string);
-
-    close(config_file);
     printf("Hello, Server!\n");
     return 0;
 }

@@ -14,9 +14,6 @@ Password
 Username3
 Password
 [USER]
-Username3
-Password
-[USER]
 Username4
 Password
 [USER]

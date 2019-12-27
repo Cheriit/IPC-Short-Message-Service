@@ -5,15 +5,15 @@ set(CMAKE_C_STANDARD 99)
 set(GCC_COVERAGE_COMPILE_FLAGS "-Wall")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 
-FIND_PACKAGE(PkgConfig REQUIRED)
-PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+#FIND_PACKAGE(PkgConfig REQUIRED)
+#PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
 
-INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
-LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
-ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
+#INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
+#LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
+#ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
 set(STRUCTURES )
-add_executable(server src/server.c)
+add_executable(server src/server.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/structs/group.c src/structs/group.h)
 add_executable(client src/client.c)
 
-TARGET_LINK_LIBRARIES(client ${GTK3_LIBRARIES})
+#TARGET_LINK_LIBRARIES(client ${GTK3_LIBRARIES})
