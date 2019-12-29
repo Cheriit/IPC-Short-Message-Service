@@ -4,59 +4,58 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <sys/wait.h>
 #include "structs/user.h"
 #include "structs/group.h"
 #include "structs/request.h"
 #include "structs/server_operations.h"
+#include "definitions.h"
 
+int run_mainloop = 1;
 
-int user_mainloop(User *user, UserList *userList, GroupList *groupList) {
-    if(!fork())
+int mainloop(UserList *userList, GroupList *groupList, key_t main_key) {
+    ActionRequest* request = (ActionRequest*)malloc(sizeof(ActionRequest));
+    LoginReq *login_request = (LoginReq*)malloc(sizeof(LoginReq));
+
+    UserList* currentUser;
+    while(run_mainloop)
     {
-        user->server_pid = getpid();
-        ActionRequest* request = (ActionRequest*)malloc(sizeof(ActionRequest));
-        while(user->client_pid)
+        currentUser = userList;
+        while(currentUser != NULL)
         {
-            msgrcv(user->ipc_id, request, sizeof(ActionRequest)- sizeof(long), -11, 0);
-            printf("Received request type %ld with content %s\n", request->mtype, request->parameters);
-            if      (request->mtype == 1)   logout_user(user);
-            else if (request->mtype == 3)   list_active_users(userList, user);
-            else if (request->mtype == 4)   list_users_in_group(user, find_on_grp_list(groupList, request->parameters));
-            else if (request->mtype == 5)   list_groups(groupList, user);
-            else if (request->mtype == 10)  sign_to_group(find_on_grp_list(groupList, request->parameters), user);
-            else if (request->mtype == 11)  sign_out_group(find_on_grp_list(groupList, request->parameters), user);
-
+            if(msgrcv(main_key, login_request, sizeof(LoginReq)- sizeof(long),LOGIN_REQ,IPC_NOWAIT) >=0)
+                login_user(userList, login_request, main_key);
+            if(msgrcv(currentUser->user->ipc_id, request, sizeof(ActionRequest)- sizeof(long), -MAX_REQ_TYPES, IPC_NOWAIT)>=0)
+            {
+                printf("Received request type %ld with content %s\n", request->mtype, request->parameters);
+                if      (request->mtype == LOGOUT_REQ     )   logout_user(currentUser->user);
+                else if (request->mtype == ACTIVE_USR_REQ )   list_active_users(userList, currentUser->user);
+                else if (request->mtype == USR_IN_GRP_REQ )   list_users_in_group(currentUser->user, find_on_grp_list(groupList, request->parameters));
+                else if (request->mtype == LIST_GRP_REQ   )   list_groups(groupList, currentUser->user);
+                else if (request->mtype == GRP_SIGNIN_REQ )  sign_to_group(find_on_grp_list(groupList, request->parameters), currentUser->user);
+                else if (request->mtype == GRP_SIGNOUT_REQ)  sign_out_group(find_on_grp_list(groupList, request->parameters), currentUser->user);
+            }
+            currentUser = currentUser->next;
         }
-        exit(0);
     }
+    exit(0);
     return 1;
 }
 
 /**
  * @todo signal overload (exiting, kill)
- * @todo multiple processes (shared memory)
  * @todo messenger
  * @todo Wall check and fix (sprintf additional var)
  */
 int main(int argc, char** argv) {
-    int run_mainloop = 1;
-    UserList* userList = create_usr_list_from_file("../config.txt");
-    GroupList* groupList = create_grp_list_from_file("../config.txt");
+    UserList*  userList  = create_usr_list_from_file(CONFIG_FILE);
+    GroupList* groupList = create_grp_list_from_file(CONFIG_FILE);
     if(userList == NULL) return 0;
 
-    key_t main_key = msgget(1008, 0666|IPC_CREAT);
+    key_t main_key = msgget(MAIN_PORT, 0666|IPC_CREAT);
     if(main_key>=0)
     {
-        LoginReq *login_request = (LoginReq*)malloc(sizeof(LoginReq));
-        printf("Waiting for login request\n");
-        while(run_mainloop)
-        {
-            msgrcv(main_key, login_request, sizeof(LoginReq)- sizeof(long),1,0);
-            if (login_user(userList, login_request, main_key))
-                user_mainloop(find_on_usr_list(userList, login_request->username), userList, groupList);
-        }
-        wait(NULL);
+        printf("Server setup accomplished. Defined queue number: %d.\n", main_key);
+        mainloop(userList, groupList, main_key);
         msgctl(main_key, IPC_RMID, 0);
     }
     else

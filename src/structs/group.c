@@ -3,16 +3,16 @@
 //
 
 #include "group.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include "../helpers/files.h"
+#include "../definitions.h"
 
 Group *_create_group() {
     Group* group = (Group*)malloc(sizeof(Group));
-    group->name  = (char*)malloc(255* sizeof(char));
+    group->name  = (char*)malloc(MAX_TEXTFIELD_SIZE* sizeof(char));
     group->users = (UserList*)malloc(sizeof(UserList*));
     return group;
 }
@@ -34,12 +34,12 @@ GroupList *add_to_grp_list(GroupList *list, Group *group) {
         list = (GroupList*)malloc(sizeof(UserList));
         list->group = group;
         list->next  = NULL;
-    }else if(list->group == NULL)
+    }
+    else if(list->group == NULL)
     {
         list->group = group;
-    }else{
+    }else
         list->next  = add_to_grp_list(list->next, group);
-    }
     return list;
 }
 
@@ -60,9 +60,7 @@ int add_user_to_grp(User *user, Group *group) {
 
 int remove_user_from_grp(User *user, Group *group) {
     if(find_on_usr_list(group->users, user->username)==NULL)
-    {
         return 0;
-    }
     group->users = remove_user_from_list(group->users, user);
     return 1;
 }
@@ -76,7 +74,7 @@ GroupList *create_grp_list_from_file(char *filename) {
     GroupList* groupList = NULL;
     char* string = (char *) malloc(sizeof(char*));
     while(read_to_char(config_file, '\n', &string)){
-        if( strcmp(string, "[GROUP]") == 0)
+        if( strcmp(string, CFG_GRP_HEADER) == 0)
         {
             Group* group = create_group_from_file(config_file);
             groupList = add_to_grp_list(groupList, group);

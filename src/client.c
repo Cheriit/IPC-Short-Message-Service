@@ -8,37 +8,39 @@
 #include <wait.h>
 #include "structs/user.h"
 #include "structs/request.h"
+#include "definitions.h"
+
+int main_loop = 1;
 
 User* login(key_t queueKey)
 {
     int success = 0;
     int pid = getpid();
-    LoginReq *login_request = (LoginReq*)malloc(sizeof(LoginReq));
-    LoginRes *login_response = (LoginRes*)malloc(sizeof(LoginRes));
-    login_request->mtype = 1;
-    login_request->pid = pid;
-    login_response->mtype = pid;
+    LoginReq       *request  = (LoginReq*)malloc(sizeof(LoginReq));
+    ActionResponse *response = (ActionResponse*)malloc(sizeof(ActionResponse));
+    request->mtype  = LOGIN_REQ;
+    request->pid    = pid;
+    response->mtype = pid;
     while(!success)
     {
         printf("Enter login: ");
-        scanf("%254s", login_request->username);
+        scanf("%s", request->username);
         printf("Enter password: ");
-        scanf("%254s", login_request->password);
-        msgsnd(queueKey, login_request, sizeof(LoginReq)- sizeof(long), 0);
-        msgrcv(queueKey, login_response, sizeof(LoginRes)- sizeof(long), pid, 0);
-        if(login_response->success == 1)
+        scanf("%s", request->password);
+        msgsnd(queueKey, request, sizeof(LoginReq) - sizeof(long), 0);
+        msgrcv(queueKey, response, sizeof(ActionResponse) - sizeof(long), pid, 0);
+        if(response->success == 1)
         {
             User* user = (User*)malloc(sizeof(User));
-            user->username = (char*)malloc(255* sizeof(char));
-            strcpy(user->username, login_request->username);
-//            user->username = login_request->username;
+            user->username = (char*)malloc(MAX_TEXTFIELD_SIZE* sizeof(char));
+            strcpy(user->username, request->username);
             user->client_pid = pid;
-            user->ipc_id = login_response->ipc_id;
-            free(login_request);
-            free(login_response);
+            user->ipc_id = atoi(response->content);
+            free(request);
+            free(response);
             return user;
         }
-        else if(login_response->success == 0)
+        else if(response->success == 0)
         {
             printf("Incorrect credentials. Try again\n");
         }
@@ -47,63 +49,60 @@ User* login(key_t queueKey)
 }
 
 int logout(User *user) {
-    printf("Signing off\n");
-    ActionResponse* response = make_request(user->ipc_id, 1, "NULL");
-    if(response->success) printf("%s\n", response->content);
+    ActionResponse* response = make_request(user->ipc_id, LOGOUT_REQ, "NULL");
+    printf("%s\n", response->content);
     free(response);
     return response->success;
 }
 
 int list_req(User *user) {
-    char command[512];
-    char details[255];
+    char command[MAX_CONTENT_SIZE];
+    char details[MAX_TEXTFIELD_SIZE];
     ActionResponse* response;
     scanf("%s", command);
     scanf("%s", details);
+    strcat(command, " ");
     strcat(command, details);
-    if(strcmp(command, "availablegroups") == 0)
+    if(strcmp(command, "available groups") == 0)
     {
-        response = make_request(user->ipc_id, 5, "NULL");
+        response = make_request(user->ipc_id, LIST_GRP_REQ, "NULL");
         strcpy(command, "Existing groups\n");
     }
-    else if(strcmp(command, "groupusers") == 0)
+    else if(strcmp(command, "group users") == 0)
     {
         scanf("%s", details);
-        response = make_request(user->ipc_id, 4, details);
+        response = make_request(user->ipc_id, USR_IN_GRP_REQ, details);
         sprintf(command, "Users in \"%s\" group\n", details);
     }
-    else if(strcmp(command, "loggedusers") == 0)
+    else if(strcmp(command, "logged users") == 0)
     {
-        response = make_request(user->ipc_id, 3, "NULL");
+        response = make_request(user->ipc_id, ACTIVE_USR_REQ, "NULL");
         strcpy(command, "Signed in users\n");
     }else{
         printf("Command doesn't exist\n");
         return 0;
     }
-    if(response->success) printf("%s\t%s\n", command, response->content);
-    else printf("An error has occured:\n\t%s", response->content);
+    printf("%s\n%s\n", command, response->content);
     free(response);
     return response->success;
 }
 
 int sign_in_grp(User *user) {
-    char command[255];
+    char command[MAX_TEXTFIELD_SIZE];
     ActionResponse* response;
     scanf("%s", command);
-    response = make_request(user->ipc_id, 10, command);
-    if(response->success) printf("Successfully signed in group %s\n", command);
-    else printf("An error has occured:\n\t%s", response->content);
+    response = make_request(user->ipc_id, GRP_SIGNIN_REQ, command);
+    printf("%s\n", response->content);
     free(response);
     return response->success;
 }
 
 int sign_out_grp(User *user) {
-    char command[255];
+    char command[MAX_TEXTFIELD_SIZE];
     ActionResponse* response;
     scanf("%s", command);
-    response = make_request(user->ipc_id, 11, command);
-    if(response->success) printf("Successfully signed out of group %s\n", command);
-    else printf("An error has occured:\n\t%s", response->content);
+    response = make_request(user->ipc_id, GRP_SIGNOUT_REQ, command);
+    printf("%s\n", response->content);
     free(response);
     return response->success;
 }
@@ -112,22 +111,21 @@ int sign_out_grp(User *user) {
  * @todo Listener on defined actions (logout, message)
  */
 int main(int argc, char **argv) {
-    key_t main_key = msgget(1008, IPC_CREAT | 0666);
-    int main_loop = 1;
+    key_t main_key = msgget(MAIN_PORT, IPC_CREAT | 0666);
     if(main_key>=0)
     {
         User* user = login(main_key);
         if(!fork())
         {
-            char command[255];
+            char command[MAX_TEXTFIELD_SIZE];
             while(main_loop)
             {
                 printf("%s>> ", user->username);
                 scanf("%s", command);
-                if( strcmp(command, "list" ) == 0) list_req(user);
-                else if( strcmp(command, "sign_in") == 0) sign_in_grp(user);
+                if     ( strcmp(command, "list")     == 0) list_req(user);
+                else if( strcmp(command, "sign_in")  == 0) sign_in_grp(user);
                 else if( strcmp(command, "sign_out") == 0) sign_out_grp(user);
-                else if( strcmp(command, "exit") == 0) main_loop = 0;
+                else if( strcmp(command, "exit")     == 0) main_loop = 0;
                 else printf("Command doesn't exists.\n");
             }
             logout(user);
@@ -140,8 +138,6 @@ int main(int argc, char **argv) {
         }
     }
     else
-    {
         printf("Unable to open a communication queue with server\n");
-    }
     return 0;
-    }
+}

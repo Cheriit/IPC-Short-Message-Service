@@ -3,17 +3,18 @@
 //
 
 #include "request.h"
+#include "../definitions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 ActionResponse *make_request(key_t ipc_id, int key, char *parameters) {
-    ActionRequest*  request     = (ActionRequest*)malloc(sizeof(ActionRequest));
+    ActionRequest*  request     = (ActionRequest*) malloc(sizeof(ActionRequest));
     ActionResponse* response    = (ActionResponse*)malloc(sizeof(ActionResponse));
     request->mtype = key;
     strcpy(request->parameters, parameters);
     msgsnd(ipc_id, request, sizeof(ActionRequest)-sizeof(long), 0);
-    msgrcv(ipc_id, response, sizeof(ActionResponse)-sizeof(long), key+100, 0);
+    msgrcv(ipc_id, response, sizeof(ActionResponse)-sizeof(long), key+REQ_RES_SHIFT, 0);
     free(request);
     return response;
 }
@@ -27,8 +28,8 @@ int make_response(key_t ipc_id, int key, int status, char *content) {
     return 0;
 }
 
-char *parse_out(char string[1024]) {
-    for(int i=0;i<1024;i++)
+char *parse_out(char string[MAX_CONTENT_SIZE]) {
+    for(int i=0;i<MAX_CONTENT_SIZE;i++)
     {
         if(string[i] == ';') string[i] = '\n';
     }

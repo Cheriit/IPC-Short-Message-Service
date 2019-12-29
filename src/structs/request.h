@@ -16,12 +16,6 @@ typedef struct LoginReq{
     int pid;
 } LoginReq;
 
-typedef struct LoginRes{
-    long mtype;
-    int success;
-    int ipc_id;
-} LoginRes;
-
 typedef struct ActionRequest{
     long mtype;
     char parameters[255];

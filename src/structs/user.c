@@ -9,12 +9,13 @@
 #include <unistd.h>
 #include <string.h>
 #include "../helpers/files.h"
+#include "../definitions.h"
 
 User *_create_user() {
-    User* user = (User*)malloc(sizeof(User));
-    user->username  = (char*)malloc(255* sizeof(char));
-    user->password  = (char*)malloc(255* sizeof(char));
-    user->ipc_id    = 0;
+    User* user       = (User*)malloc(sizeof(User));
+    user->username   = (char*)malloc(MAX_TEXTFIELD_SIZE * sizeof(char));
+    user->password   = (char*)malloc(MAX_TEXTFIELD_SIZE * sizeof(char));
+    user->ipc_id     = 0;
     user->client_pid = 0;
     user->server_pid = 0;
     return user;
@@ -39,7 +40,8 @@ UserList *add_to_usr_list(UserList *list, User *user) {
         list        = (UserList*)malloc(sizeof(UserList));
         list->user  = user;
         list->next  = NULL;
-    }else if(list->user == NULL)
+    }
+    else if(list->user == NULL)
         list->user = user;
     else
         list->next = add_to_usr_list(list->next, user);
@@ -47,7 +49,7 @@ UserList *add_to_usr_list(UserList *list, User *user) {
 }
 
 User *find_on_usr_list(UserList *list, char *username) {
-    if(list == NULL || list->user == NULL) return NULL;
+    if(list == NULL || list->user == NULL)          return NULL;
     if(strcmp(list->user->username, username) == 0) return list->user;
     return find_on_usr_list(list->next, username);
 }
@@ -59,7 +61,8 @@ UserList* remove_user_from_list(UserList *list, User *user) {
         UserList* newRoot = list->next;
         free(list);
         return newRoot;
-    }else
+    }
+    else
     {
         list->next = remove_user_from_list(list->next, user);
         return list;
@@ -76,7 +79,7 @@ UserList *create_usr_list_from_file(char *filename) {
     UserList* userList = NULL;
     char* string = (char *) malloc(sizeof(char*));
     while(read_to_char(config_file, '\n', &string)){
-        if( strcmp(string, "[USER]") == 0)
+        if( strcmp(string, CFG_USR_HEADER) == 0)
         {
             User* user = create_user_from_file(config_file);
             userList = add_to_usr_list(userList, user);

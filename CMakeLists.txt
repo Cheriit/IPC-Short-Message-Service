@@ -13,7 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 #ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
 set(STRUCTURES )
-add_executable(server src/server.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/structs/group.c src/structs/group.h src/structs/messages.c src/structs/messages.h src/structs/request.h src/structs/server_operations.c src/structs/server_operations.h src/structs/request.c)
-add_executable(client src/client.c src/structs/request.h src/structs/request.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h)
+add_executable(server src/server.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/structs/group.c src/structs/group.h src/structs/messages.c src/structs/messages.h src/structs/request.h src/structs/server_operations.c src/structs/server_operations.h src/structs/request.c src/definitions.h)
+add_executable(client src/client.c src/structs/request.h src/structs/request.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/definitions.h)
 
 #TARGET_LINK_LIBRARIES(client ${GTK3_LIBRARIES})
