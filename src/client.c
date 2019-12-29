@@ -32,7 +32,7 @@ User* login(key_t queueKey)
             user->username = (char*)malloc(255* sizeof(char));
             strcpy(user->username, login_request->username);
 //            user->username = login_request->username;
-            user->pid = pid;
+            user->client_pid = pid;
             user->ipc_id = login_response->ipc_id;
             free(login_request);
             free(login_response);
@@ -47,7 +47,7 @@ User* login(key_t queueKey)
 }
 
 int logout(User *user) {
-    printf("Signing off");
+    printf("Signing off\n");
     ActionResponse* response = make_request(user->ipc_id, 1, "NULL");
     if(response->success) printf("%s\n", response->content);
     free(response);
@@ -109,9 +109,7 @@ int sign_out_grp(User *user) {
 }
 
 /**
- * @todo Listener on defined actions (logout)
- *
- *
+ * @todo Listener on defined actions (logout, message)
  */
 int main(int argc, char **argv) {
     key_t main_key = msgget(1008, IPC_CREAT | 0666);
@@ -133,6 +131,7 @@ int main(int argc, char **argv) {
                 else printf("Command doesn't exists.\n");
             }
             logout(user);
+            exit(0);
         }
         else
         {

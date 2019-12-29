@@ -12,16 +12,17 @@
 
 User *_create_user() {
     User* user = (User*)malloc(sizeof(User));
-    user->username = (char*)malloc(255* sizeof(char));
-    user->password = (char*)malloc(255* sizeof(char));
-    user->ipc_id = 0;
-    user->pid = 0;
+    user->username  = (char*)malloc(255* sizeof(char));
+    user->password  = (char*)malloc(255* sizeof(char));
+    user->ipc_id    = 0;
+    user->client_pid = 0;
+    user->server_pid = 0;
     return user;
 }
 
 User *create_user_from_file(int file) {
-    char* string = (char *) malloc(sizeof(char*));
-    User* user = _create_user();
+    char* string    = (char *) malloc(sizeof(char*));
+    User* user      = _create_user();
 
     get_line(file, &string);
     strcpy(user->username, string);
@@ -33,14 +34,15 @@ User *create_user_from_file(int file) {
 }
 
 UserList *add_to_usr_list(UserList *list, User *user) {
-    if(list == NULL || list->user == NULL)
+    if(list == NULL)
     {
-        list = (UserList*)malloc(sizeof(UserList));
+        list        = (UserList*)malloc(sizeof(UserList));
+        list->user  = user;
+        list->next  = NULL;
+    }else if(list->user == NULL)
         list->user = user;
-        list->next = NULL;
-    }else{
+    else
         list->next = add_to_usr_list(list->next, user);
-    }
     return list;
 }
 

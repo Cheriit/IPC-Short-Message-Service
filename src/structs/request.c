@@ -8,8 +8,8 @@
 #include <string.h>
 
 ActionResponse *make_request(key_t ipc_id, int key, char *parameters) {
-    ActionRequest* request = (ActionRequest*)malloc(sizeof(ActionRequest));
-    ActionResponse* response = (ActionResponse*)malloc(sizeof(ActionResponse));
+    ActionRequest*  request     = (ActionRequest*)malloc(sizeof(ActionRequest));
+    ActionResponse* response    = (ActionResponse*)malloc(sizeof(ActionResponse));
     request->mtype = key;
     strcpy(request->parameters, parameters);
     msgsnd(ipc_id, request, sizeof(ActionRequest)-sizeof(long), 0);
@@ -19,8 +19,8 @@ ActionResponse *make_request(key_t ipc_id, int key, char *parameters) {
 }
 int make_response(key_t ipc_id, int key, int status, char *content) {
     ActionResponse* response = (ActionResponse*)malloc(sizeof(ActionResponse));
-    response->mtype = key;
-    response->success = status;
+    response->mtype     = key;
+    response->success   = status;
     strcpy(response->content, content);
     msgsnd(ipc_id, response, sizeof(ActionResponse)- sizeof(long), 0);
     free(response);

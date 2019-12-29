@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/msg.h>
+#include <signal.h>
 #include "server_operations.h"
 #include "group.h"
 
@@ -21,12 +22,12 @@ int login_user(UserList* userList, LoginReq* request, key_t main_key) {
     }
     else if(strcmp(user->password, request->password) == 0)
     {
-        if (user->pid != 0)
+        if (user->client_pid != 0)
         {
             logout_user(user);
         }
         user->ipc_id = msgget(1000+request->pid, 0666|IPC_CREAT);
-        user->pid = request->pid;
+        user->client_pid = request->pid;
 
         login_response->success = 1;
         login_response->ipc_id = user->ipc_id;
@@ -47,9 +48,10 @@ int login_user(UserList* userList, LoginReq* request, key_t main_key) {
 int logout_user(User *user) {
     make_response(user->ipc_id, 101, 1, "User successfully signed out\n");
     printf("User %s has been signed out\n", user->username);
-    user->pid = 0;
+    user->client_pid = 0;
     user->ipc_id = 0;
     msgctl(user->ipc_id, IPC_RMID, 0);
+    kill(user->server_pid, 3);
     return 1;
 }
 
@@ -58,7 +60,7 @@ int list_active_users(UserList* userList, User* user){
     UserList* currentUser = userList;
     while(currentUser != NULL)
     {
-        if(currentUser->user->pid > 0)
+        if(currentUser->user->client_pid > 0)
             sprintf(content, "%s\t%s\n",content, currentUser->user->username);
         currentUser = currentUser->next;
     }

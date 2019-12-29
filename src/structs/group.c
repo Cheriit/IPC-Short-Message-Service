@@ -12,7 +12,7 @@
 
 Group *_create_group() {
     Group* group = (Group*)malloc(sizeof(Group));
-    group->name = (char*)malloc(255* sizeof(char));
+    group->name  = (char*)malloc(255* sizeof(char));
     group->users = (UserList*)malloc(sizeof(UserList*));
     return group;
 }
@@ -29,13 +29,16 @@ Group *create_group_from_file(int file) {
 
 
 GroupList *add_to_grp_list(GroupList *list, Group *group) {
-    if(list == NULL || list->group == NULL)
+    if(list == NULL)
     {
         list = (GroupList*)malloc(sizeof(UserList));
         list->group = group;
-        list->next = NULL;
-    }else {
-        list->next = add_to_grp_list(list->next, group);
+        list->next  = NULL;
+    }else if(list->group == NULL)
+    {
+        list->group = group;
+    }else{
+        list->next  = add_to_grp_list(list->next, group);
     }
     return list;
 }
@@ -68,7 +71,6 @@ GroupList *create_grp_list_from_file(char *filename) {
     int config_file = open(filename, O_RDONLY);
     if(config_file == -1)
     {
-        printf("Unable to open a file \"%s\"\n", filename);
         return 0;
     }
     GroupList* groupList = NULL;

@@ -10,7 +10,8 @@
 typedef struct User{
     char* username;
     char* password;
-    int pid;
+    int client_pid;
+    int server_pid;
     int ipc_id;
 } User;
 
