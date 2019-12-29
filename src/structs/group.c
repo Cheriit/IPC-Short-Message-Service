@@ -29,7 +29,7 @@ Group *create_group_from_file(int file) {
 
 
 GroupList *add_to_grp_list(GroupList *list, Group *group) {
-    if(list == NULL)
+    if(list == NULL || list->group == NULL)
     {
         list = (GroupList*)malloc(sizeof(UserList));
         list->group = group;
@@ -41,7 +41,7 @@ GroupList *add_to_grp_list(GroupList *list, Group *group) {
 }
 
 Group *find_on_grp_list(GroupList *list, char *group_name) {
-    if(list == NULL) return NULL;
+    if(list == NULL || list->group == NULL) return NULL;
     if(strcmp(list->group->name, group_name) == 0) return list->group;
     return find_on_grp_list(list->next, group_name);
 }
@@ -49,7 +49,7 @@ Group *find_on_grp_list(GroupList *list, char *group_name) {
 int add_user_to_grp(User *user, Group *group) {
     if(find_on_usr_list(group->users, user->username)==NULL)
     {
-        add_to_usr_list(group->users, user);
+        group->users = add_to_usr_list(group->users, user);
         return 1;
     }
     return 0;
@@ -68,7 +68,7 @@ GroupList *create_grp_list_from_file(char *filename) {
     int config_file = open(filename, O_RDONLY);
     if(config_file == -1)
     {
-        printf("Unable to open a file \"%s\"", filename);
+        printf("Unable to open a file \"%s\"\n", filename);
         return 0;
     }
     GroupList* groupList = NULL;

@@ -32,28 +32,8 @@ User *create_user_from_file(int file) {
     return user;
 }
 
-int login_user(User *user, char *password, int pid) {
-    if (user->pid != 0)
-    {
-        logout_user(user);
-    }
-    if(user->password == password)
-    {
-        user->pid = pid;
-
-        return user->ipc_id;
-    }
-    return 0;
-}
-
-int logout_user(User *user) {
-    user->pid = 0;
-    user->ipc_id = 0;
-    // TEMPORARY SOLUTION
-}
-
 UserList *add_to_usr_list(UserList *list, User *user) {
-    if(list == NULL)
+    if(list == NULL || list->user == NULL)
     {
         list = (UserList*)malloc(sizeof(UserList));
         list->user = user;
@@ -65,7 +45,7 @@ UserList *add_to_usr_list(UserList *list, User *user) {
 }
 
 User *find_on_usr_list(UserList *list, char *username) {
-    if(list == NULL) return NULL;
+    if(list == NULL || list->user == NULL) return NULL;
     if(strcmp(list->user->username, username) == 0) return list->user;
     return find_on_usr_list(list->next, username);
 }
@@ -88,7 +68,7 @@ UserList *create_usr_list_from_file(char *filename) {
     int config_file = open(filename, O_RDONLY);
     if(config_file == -1)
     {
-        printf("Unable to open a file \"%s\"", filename);
+        printf("Unable to open a file \"%s\"\n", filename);
         return 0;
     }
     UserList* userList = NULL;
