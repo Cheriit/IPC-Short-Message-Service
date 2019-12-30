@@ -18,10 +18,15 @@
 #define REQ_RES_SHIFT 100
 
 #define LOGIN_REQ 1
-#define LOGOUT_REQ 2
-#define ACTIVE_USR_REQ 3
-#define USR_IN_GRP_REQ 4
-#define LIST_GRP_REQ 5
+
+#define USR_MSG_RES 1
+#define GRP_MSG_RES 2
+#define LOGOUT_REQ 3
+#define ACTIVE_USR_REQ 4
+#define USR_IN_GRP_REQ 5
+#define LIST_GRP_REQ 6
 #define GRP_SIGNIN_REQ 10
 #define GRP_SIGNOUT_REQ 11
+#define USR_MSG_REQ 21
+#define GRP_MSG_REQ 22
 #endif //PROJECT_IPC_DEFINITIONS_H

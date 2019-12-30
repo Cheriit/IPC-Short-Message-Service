@@ -8,13 +8,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-ActionResponse *make_request(key_t ipc_id, int key, char *parameters) {
+ActionResponse *make_request(key_t ipc_id, int key, char parameters[255], int flag) {
     ActionRequest*  request     = (ActionRequest*) malloc(sizeof(ActionRequest));
     ActionResponse* response    = (ActionResponse*)malloc(sizeof(ActionResponse));
     request->mtype = key;
     strcpy(request->parameters, parameters);
     msgsnd(ipc_id, request, sizeof(ActionRequest)-sizeof(long), 0);
-    msgrcv(ipc_id, response, sizeof(ActionResponse)-sizeof(long), key+REQ_RES_SHIFT, 0);
+    msgrcv(ipc_id, response, sizeof(ActionResponse)-sizeof(long), key+REQ_RES_SHIFT, flag);
     free(request);
     return response;
 }

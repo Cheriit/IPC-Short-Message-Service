@@ -10,6 +10,7 @@
 #include "group.h"
 #include "../definitions.h"
 
+
 int login_user(UserList* userList, LoginReq* request, key_t main_key) {
     ActionResponse* login_response = (ActionResponse*)malloc(sizeof(ActionResponse));
     login_response->mtype = request->pid;
@@ -49,10 +50,10 @@ int login_user(UserList* userList, LoginReq* request, key_t main_key) {
 int logout_user(User *user) {
     make_response(user->ipc_id, LOGOUT_REQ+REQ_RES_SHIFT, 1, "User successfully signed out\n");
     printf("User %s has been signed out\n", user->username);
-    user->client_pid = 0;
-    user->ipc_id = 0;
+    kill(user->client_pid, SIGINT);
     msgctl(user->ipc_id, IPC_RMID, 0);
-    kill(user->server_pid, 3);
+    user->client_pid = 0;
+    user->ipc_id = -1;
     return 1;
 }
 
@@ -159,4 +160,16 @@ int sign_out_group(Group * group, User* user)
     printf("%s\n", content);
     make_response(user->ipc_id, GRP_SIGNOUT_REQ+REQ_RES_SHIFT, status, content);
     return status;
+}
+
+int end_sessions(key_t main_key, UserList *userList) {
+    UserList* currentEl = userList;
+    while(currentEl != NULL)
+    {
+        if(currentEl->user->ipc_id >=0)
+            logout_user(currentEl->user);
+        currentEl = currentEl->next;
+    }
+    msgctl(main_key, IPC_RMID, 0);
+    return 0;
 }

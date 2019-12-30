@@ -27,7 +27,7 @@ typedef struct ActionResponse{
     char content[1024];
 } ActionResponse;
 
-ActionResponse* make_request(key_t ipc_id, int key, char parameters[255]);
+ActionResponse *make_request(key_t ipc_id, int key, char parameters[255], int flag);
 int make_response(key_t ipc_id, int key, int status, char content[1024]);
 char* parse_out(char* string);
 

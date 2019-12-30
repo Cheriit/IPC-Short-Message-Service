@@ -15,7 +15,7 @@ User *_create_user() {
     User* user       = (User*)malloc(sizeof(User));
     user->username   = (char*)malloc(MAX_TEXTFIELD_SIZE * sizeof(char));
     user->password   = (char*)malloc(MAX_TEXTFIELD_SIZE * sizeof(char));
-    user->ipc_id     = 0;
+    user->ipc_id     = -1;
     user->client_pid = 0;
     user->server_pid = 0;
     return user;

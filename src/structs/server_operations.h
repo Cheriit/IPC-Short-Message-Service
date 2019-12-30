@@ -16,4 +16,5 @@ int list_users_in_group(User* user, Group* group);
 int list_groups(GroupList* groupList, User* user);
 int sign_to_group(Group * group, User* user);
 int sign_out_group(Group * group, User* user);
+int end_sessions(key_t main_key, UserList* userList);
 #endif //PROJECT_IPC_SERVER_OPERATIONS_H
