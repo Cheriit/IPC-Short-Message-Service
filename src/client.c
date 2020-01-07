@@ -17,7 +17,7 @@ void close_client_main()
 {
     printf("Signing out client...\n");
     printf("Enter exit to leave program... \n");
-    sprintf(stdin, "exit");
+    sprintf((char *) stdin, "exit");
     fflush(stdout);
     main_loop = 0;
 }
@@ -170,11 +170,12 @@ int main(int argc, char **argv) {
         {
             signal(SIGINT, close_client_child);
             Message* msg = (Message*)malloc(sizeof(Message));
-            while(receive_msg(user->ipc_id, msg) == 0 && main_loop == 1)
+            while(receive_msg(user->ipc_id, msg) >= 0 && main_loop == 1)
             {
                 printf("%s>> ", user->username);
                 fflush(stdout);
             }
+            printf("Leaving message listener\n");
         }
     }
     else

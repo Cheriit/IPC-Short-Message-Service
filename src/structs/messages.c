@@ -15,7 +15,7 @@ int send_msg(key_t main_key, Message *msg) {
 }
 
 int receive_msg(key_t key, Message *msg) {
-    int status = msgrcv(key, msg, sizeof(Message)- sizeof(long), -GRP_MSG_RES, 0);
+    int status = msgrcv(key, msg, sizeof(Message)- sizeof(long), -1*GRP_MSG_RES, 0);
     printf("\33[2K\r");
     if(msg->mtype == USR_MSG_RES)
     {
