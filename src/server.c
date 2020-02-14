@@ -144,7 +144,7 @@ int logout_user(User *user) {
 }
 
 int list_active_users(UserList* userList, User* user){
-    char content[MAX_CONTENT_SIZE] = "\t";
+    char content[MAX_CONTENT_SIZE] = "";
     UserList* currentUser = userList;
     while(currentUser != NULL)
     {
@@ -184,7 +184,7 @@ int list_users_in_group(User* user, Group* group){
 }
 
 int list_groups(GroupList* groupList, User* user){
-    char content[MAX_CONTENT_SIZE] = "\t";
+    char content[MAX_CONTENT_SIZE] = "";
     GroupList* currentGroup = groupList;
     while(currentGroup != NULL)
     {
