@@ -57,7 +57,7 @@ User* login(key_t queueKey)
         }
         else if(response->success == 0)
         {
-            printf("Incorrect credentials. Try again\n");
+            printf("%s\n", response->content);
         }
     }
     return NULL;
@@ -125,20 +125,28 @@ int sign_out_grp(User *user) {
 int show_help()
 {
     printf("\e[1;1H\e[2J");
-    printf("\t\t\n");
+    printf("======== HELP ========\n");
+    printf("\tlist available groups\t\tdisplay list of available groups.\n");
+    printf("\tlist group users [group]\tdisplay list of user in [group].\n");
+    printf("\tlist logged users\t\tdisplay list of active users.\n");
+    printf("\tsign_in [group]\t\t\tsign into [group].\n");
+    printf("\tsign_out [group]\t\tsign out from [group].\n");
+    printf("\tmsg usr [username] [content]\tsend message to [username] with [content].\n");
+    printf("\tmsg grp [group name] [content]\tsend message to [group name] with [content].\n");
+    printf("\tclear\t\t\t\tclears feed.\n");
+    printf("\thelp\t\t\t\tshows help.\n");
+    printf("\texit\t\t\t\tshut down client.\n");
+    printf("======== END HELP ========\n");
     return 1;
 }
-/**
- * @todo Listener on defined actions (logout, message)
- * @todo exiting
- * @todo help
- */
+
 int main(int argc, char **argv) {
     key_t main_key = msgget(MAIN_PORT, IPC_CREAT | 0666);
     if(main_key>=0)
     {
         User* user = login(main_key);
         printf("\e[1;1H\e[2J");
+        show_help();
         fflush(stdout);
         int pid = fork();
         if(pid)

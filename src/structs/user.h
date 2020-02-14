@@ -11,8 +11,8 @@ typedef struct User{
     char* username;
     char* password;
     int client_pid;
-    int server_pid;
     int ipc_id;
+    int failed_login_count;
 } User;
 
 typedef struct UserList{

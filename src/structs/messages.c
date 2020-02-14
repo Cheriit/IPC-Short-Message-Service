@@ -74,6 +74,13 @@ int process_usr_msg(User *user, UserList *userList, Message *msg) {
         make_response(user->ipc_id, USR_MSG_REQ+REQ_RES_SHIFT,0, "You cannot send messages to yourself.\n");
         return 0;
     }
+    else if(user->failed_login_count > 3)
+    {
+        printf("User %s is locked.\n", msg->to);
+        make_response(user->ipc_id, USR_MSG_REQ+REQ_RES_SHIFT,0, "You've been locked. You can't send user messages\n");
+        return 0;
+    }
+
     User* targetUser = find_on_usr_list(userList, msg->to);
     msg->mtype = USR_MSG_RES;
     if(targetUser == NULL)
@@ -87,7 +94,12 @@ int process_usr_msg(User *user, UserList *userList, Message *msg) {
         printf("User %s isn't active right now.\n", msg->to);
         make_response(user->ipc_id, USR_MSG_REQ+REQ_RES_SHIFT,0, "User isn't active.\n");
         return 0;
-
+    }
+    else if(targetUser->failed_login_count > 3)
+    {
+        printf("User %s is locked.\n", msg->to);
+        make_response(user->ipc_id, USR_MSG_REQ+REQ_RES_SHIFT,0, "Target user is locked.\n");
+        return 0;
     }
     else
     {
@@ -108,6 +120,12 @@ int process_grp_msg(User *user, GroupList *groupList, Message *msg) {
         make_response(user->ipc_id, GRP_MSG_REQ+REQ_RES_SHIFT,0, "Group doesn't exists.\n");
         return 0;
     }
+    else if(user->failed_login_count > 3)
+    {
+        printf("User %s is locked.\n", msg->to);
+        make_response(user->ipc_id, USR_MSG_REQ+REQ_RES_SHIFT,0, "You've been locked. You can't send group messages.\n");
+        return 0;
+    }
     else
     {
         if( find_on_usr_list(targetGroup->users, user->username))
@@ -115,7 +133,7 @@ int process_grp_msg(User *user, GroupList *groupList, Message *msg) {
             UserList* temporaryUser = targetGroup->users;
             while(temporaryUser != NULL && temporaryUser->user != NULL && temporaryUser->user->ipc_id != -1)
             {
-                if(strcmp(temporaryUser->user->username, user->username) != 0)
+                if(strcmp(temporaryUser->user->username, user->username) != 0 && temporaryUser->user->failed_login_count<=3)
                 {
                     send_msg(temporaryUser->user->ipc_id, msg);
                 }

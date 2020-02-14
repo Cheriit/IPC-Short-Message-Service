@@ -7,24 +7,25 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include "../definitions.h"
 
 
 typedef struct LoginReq{
     long mtype;
-    char username[255];
-    char password[255];
+    char username[MAX_TEXTFIELD_SIZE];
+    char password[MAX_TEXTFIELD_SIZE];
     int pid;
 } LoginReq;
 
 typedef struct ActionRequest{
     long mtype;
-    char parameters[255];
+    char parameters[MAX_TEXTFIELD_SIZE];
 } ActionRequest;
 
 typedef struct ActionResponse{
     long mtype;
     int success;
-    char content[1024];
+    char content[MAX_CONTENT_SIZE];
 } ActionResponse;
 
 ActionResponse *make_request(key_t ipc_id, int key, char parameters[255], int flag);

@@ -17,7 +17,6 @@ User *_create_user() {
     user->password   = (char*)malloc(MAX_TEXTFIELD_SIZE * sizeof(char));
     user->ipc_id     = -1;
     user->client_pid = 0;
-    user->server_pid = 0;
     return user;
 }
 
@@ -30,7 +29,7 @@ User *create_user_from_file(int file) {
 
     get_line(file, &string);
     strcpy(user->password, string);
-
+    user->failed_login_count = 0;
     return user;
 }
 
