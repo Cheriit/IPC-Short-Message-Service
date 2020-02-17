@@ -18,10 +18,10 @@ Group *_create_group() {
 }
 
 Group *create_group_from_file(int file) {
-    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
+    char string[MAX_TEXTFIELD_SIZE];
     Group* group = _create_group();
 
-    get_line(file, &string);
+    get_line(file, string);
     strcpy(group->name, string);
 
     return group;
@@ -72,15 +72,14 @@ GroupList *create_grp_list_from_file(char *filename) {
         return 0;
     }
     GroupList* groupList = NULL;
-    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
-    while(read_to_char(config_file, '\n', &string)){
+    char string[MAX_TEXTFIELD_SIZE];
+    while(read_to_char(config_file, '\n', string)){
         if( strcmp(string, CFG_GRP_HEADER) == 0)
         {
             Group* group = create_group_from_file(config_file);
             groupList = add_to_grp_list(groupList, group);
         }
     }
-    free(string);
     close(config_file);
     return groupList;
 }

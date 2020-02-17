@@ -21,13 +21,13 @@ User *_create_user() {
 }
 
 User *create_user_from_file(int file) {
-    char* string    = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
+    char string[MAX_TEXTFIELD_SIZE];
     User* user      = _create_user();
 
-    get_line(file, &string);
+    get_line(file, string);
     strcpy(user->username, string);
 
-    get_line(file, &string);
+    get_line(file, string);
     strcpy(user->password, string);
     user->failed_login_count = 0;
     return user;
@@ -76,15 +76,14 @@ UserList *create_usr_list_from_file(char *filename) {
         return 0;
     }
     UserList* userList = NULL;
-    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
-    while(read_to_char(config_file, '\n', &string)){
+    char string[MAX_TEXTFIELD_SIZE];
+    while(read_to_char(config_file, '\n', string)){
         if( strcmp(string, CFG_USR_HEADER) == 0)
         {
             User* user = create_user_from_file(config_file);
             userList = add_to_usr_list(userList, user);
         }
     }
-    free(string);
     close(config_file);
     return userList;
 }
