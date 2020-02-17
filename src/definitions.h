@@ -8,7 +8,7 @@
 #define MAX_TEXTFIELD_SIZE 255
 #define MAX_CONTENT_SIZE 1024
 
-#define CONFIG_FILE "../config.txt"
+#define CONFIG_FILE "config.txt"
 #define CFG_USR_HEADER "[USER]"
 #define CFG_GRP_HEADER "[GROUP]"
 

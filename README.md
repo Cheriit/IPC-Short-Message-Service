@@ -1,22 +1,21 @@
 # IPC Messenger for System & Concurrent Programming
 
 ## Requirements
-- cmake
+- gcc
 
 ## Compilation info
 ```
-mkdir cmake-build-debug
-cd cmake-build-debug
-cmake ..
-make
+gcc src/client.c src/structs/request.h src/structs/request.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/definitions.h src/structs/messages.c src/structs/messages.h src/structs/group.c src/structs/group.h -o client -Wall
+
+gcc src/server.c src/structs/request.h src/structs/request.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/definitions.h src/structs/messages.c src/structs/messages.h src/structs/group.c src/structs/group.h -o server -Wall
 ```
 
 ## Running info
 ### Server
-Inside `cmake-build-debug` use `./server` to run server (do it first). It's crucial to run server first, because client requires it to proper run.
+Use `./server` to run server (do it first). It's crucial to run server first, because client requires it to proper run.
 
 ### Client
-Inside `cmake-build-debug` use `./client` to run client.
+Use `./client` to run client.
 
 ## Files content
 ### `./src`
