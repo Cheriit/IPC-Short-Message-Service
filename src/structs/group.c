@@ -18,7 +18,7 @@ Group *_create_group() {
 }
 
 Group *create_group_from_file(int file) {
-    char* string = (char *) malloc(sizeof(char*));
+    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
     Group* group = _create_group();
 
     get_line(file, &string);
@@ -72,7 +72,7 @@ GroupList *create_grp_list_from_file(char *filename) {
         return 0;
     }
     GroupList* groupList = NULL;
-    char* string = (char *) malloc(sizeof(char*));
+    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
     while(read_to_char(config_file, '\n', &string)){
         if( strcmp(string, CFG_GRP_HEADER) == 0)
         {

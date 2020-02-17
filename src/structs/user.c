@@ -21,7 +21,7 @@ User *_create_user() {
 }
 
 User *create_user_from_file(int file) {
-    char* string    = (char *) malloc(sizeof(char*));
+    char* string    = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
     User* user      = _create_user();
 
     get_line(file, &string);
@@ -76,7 +76,7 @@ UserList *create_usr_list_from_file(char *filename) {
         return 0;
     }
     UserList* userList = NULL;
-    char* string = (char *) malloc(sizeof(char*));
+    char* string = (char *) malloc(sizeof(char*)*MAX_TEXTFIELD_SIZE);
     while(read_to_char(config_file, '\n', &string)){
         if( strcmp(string, CFG_USR_HEADER) == 0)
         {
