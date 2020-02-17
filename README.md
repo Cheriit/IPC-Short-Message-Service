@@ -10,6 +10,7 @@ gcc src/client.c src/structs/request.h src/structs/request.c src/structs/user.c 
 gcc src/server.c src/structs/request.h src/structs/request.c src/structs/user.c src/structs/user.h src/helpers/files.c src/helpers/files.h src/definitions.h src/structs/messages.c src/structs/messages.h src/structs/group.c src/structs/group.h -o server -Wall
 ```
 
+or run `compile.sh` script.
 ## Running info
 ### Server
 Use `./server` to run server (do it first). It's crucial to run server first, because client requires it to proper run.
