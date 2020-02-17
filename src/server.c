@@ -77,6 +77,9 @@ int main(int argc, char** argv) {
     if(userList == NULL) return 0;
 
     key_t main_key = msgget(MAIN_PORT, 0666|IPC_CREAT);
+    msgctl(main_key,IPC_RMID,NULL);
+    main_key = msgget(MAIN_PORT, 0666|IPC_CREAT);
+
     signal(SIGINT, close_client);
     if(main_key>=0)
     {
