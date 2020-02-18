@@ -21,7 +21,7 @@ typedef struct GroupList{
 Group* _create_group();
 Group* create_group_from_file(int file);
 
-GroupList* create_grp_list_from_file(char* filename);
+GroupList* create_grp_list_from_file(char* filename, UserList* userList);
 GroupList* add_to_grp_list(GroupList* list, Group* group);
 Group* find_on_grp_list(GroupList* list, char* group_name);
 

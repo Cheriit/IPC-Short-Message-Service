@@ -65,12 +65,14 @@ int remove_user_from_grp(User *user, Group *group) {
     return 1;
 }
 
-GroupList *create_grp_list_from_file(char *filename) {
+GroupList *create_grp_list_from_file(char *filename, UserList* userList) {
     int config_file = open(filename, O_RDONLY);
     if(config_file == -1)
     {
         return 0;
     }
+    int is_grp = 0;
+    Group* currentGroup = NULL;
     GroupList* groupList = NULL;
     char string[MAX_TEXTFIELD_SIZE];
     while(read_to_char(config_file, '\n', string)){
@@ -78,6 +80,14 @@ GroupList *create_grp_list_from_file(char *filename) {
         {
             Group* group = create_group_from_file(config_file);
             groupList = add_to_grp_list(groupList, group);
+            currentGroup = group;
+            is_grp = 1;
+        } else if (strcmp(string, CFG_GRP_FOOTER) == 0){
+            is_grp = 0;
+        } else if(is_grp == 1) {
+            User* user = find_on_usr_list(userList, string);
+            if(user != NULL)
+                add_user_to_grp(user, currentGroup);
         }
     }
     close(config_file);

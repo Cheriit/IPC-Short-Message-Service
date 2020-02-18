@@ -10,7 +10,9 @@
 
 #define CONFIG_FILE "config.txt"
 #define CFG_USR_HEADER "[USER]"
+#define CFG_USR_FOOTER "[ENDUSER]"
 #define CFG_GRP_HEADER "[GROUP]"
+#define CFG_GRP_FOOTER "[ENDGROUP]"
 
 #define MAIN_PORT 1008
 

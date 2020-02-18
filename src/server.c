@@ -73,7 +73,7 @@ int mainloop(UserList *userList, GroupList *groupList, key_t main_key) {
 
 int main(int argc, char** argv) {
     UserList*  userList  = create_usr_list_from_file(CONFIG_FILE);
-    GroupList* groupList = create_grp_list_from_file(CONFIG_FILE);
+    GroupList* groupList = create_grp_list_from_file(CONFIG_FILE, userList);
     if(userList == NULL) return 0;
 
     key_t main_key = msgget(MAIN_PORT, 0666|IPC_CREAT);
@@ -164,7 +164,7 @@ int list_active_users(UserList* userList, User* user){
 }
 
 int list_users_in_group(User* user, Group* group){
-    char content[MAX_CONTENT_SIZE] = "\t";
+    char content[MAX_CONTENT_SIZE] = "";
     if(group!=NULL)
     {
         UserList* currentUser = group->users;
