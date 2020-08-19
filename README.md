@@ -1,5 +1,7 @@
 # IPC Messenger for System & Concurrent Programming
 
+Simple messaging system between processes.
+
 ## Requirements
 - gcc
 
